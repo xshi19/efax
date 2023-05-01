@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from array_api_compat import array_namespace
 from jax import jit
 from tensorflow_probability.substrates import jax as tfp
-from tjax import JaxComplexArray, JaxRealArray
+from tjax import JaxComplexArray, JaxRealArray, print_generic
 
 from .iteration import parameters
 from .parametrization import Distribution
@@ -90,7 +90,15 @@ def _parameter_dot_product(x: JaxComplexArray, y: JaxComplexArray, n_axes: int) 
     """Returns the real component of the dot product of the final n_axes axes of two arrays."""
     xp = array_namespace(x, y)
     axes = tuple(range(-n_axes, 0))
-    return xp.sum(xp.real(x * y), axis=axes)
+    z = xp.zeros_like(x)
+    print_generic(x, y, z, immediate=True)
+    assert x.shape == y.shape == z.shape
+    product = xp.where(x == z,
+                       z,
+                       xp.where(y == z,
+                                z,
+                                xp.real(x * y)))
+    return xp.sum(product, axis=axes)
 
 
 if TYPE_CHECKING:
