@@ -18,6 +18,9 @@ from efax import (BooleanRing, HasConjugatePrior, HasEntropyEP, HasEntropyNP,
 from .create_info import (BetaInfo, ChiSquareInfo, ComplexCircularlySymmetricNormalInfo,
                           DirichletInfo, GammaInfo, GeneralizedDirichletInfo, InverseGammaInfo,
                           JointInfo, create_infos)
+from .create_info import (ComplexCircularlySymmetricNormalInfo, GeneralizedDirichletInfo,
+                          create_infos)
+from .distribution_info import DistributionInfo
 
 
 @pytest.fixture(autouse=True)
@@ -99,9 +102,7 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
              if supports(structure := (info.nat_structure() if natural else info.exp_structure()),
                          Samplable)
              if not any_integral_supports(structure)
-             if not isinstance(info,
-                               ComplexCircularlySymmetricNormalInfo | BetaInfo | DirichletInfo
-                               | ChiSquareInfo | GammaInfo | InverseGammaInfo | JointInfo)
+             if not isinstance(info, ComplexCircularlySymmetricNormalInfo)  # TODO: Fix this.
              if info.tests_selected(distribution_name_option)]
         ids = [f"{info.name()}{'NP' if natural else 'EP'}" for info, natural in p]
         metafunc.parametrize(("sampling_wc_distribution_info", "natural"), p,
